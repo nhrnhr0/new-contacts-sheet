@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>טופס הגשה</title>
+  <style>
+    body {
+      direction:rtl;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>טופס הגשה</h1>
+  <form id="submissionForm" name="submit-to-google-sheet" method="POST">
+    <div class="form-group">
+      <label for="name">שם</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+      <label for="phone">טלפון</label>
+      <input type="tel" id="phone" name="phone" required>
+    </div>
+    <div class="form-group">
+      <label for="businessName">שם העסק</label>
+      <input type="text" id="businessName" name="businessName">
+    </div>
+    <div class="form-group">
+      <label for="area">יישוב</label>
+      <input type="text" id="area" name="area">
+    </div>
+    <div class="form-group">
+      <label for="comment">הערה</label>
+      <textarea id="comment" name="comment"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="referrer">מי הפנה</label>
+      <input type="text" id="referrer" name="referrer">
+    </div>
+    <button type="submit" id="submit-btn">שלח</button>
+  </form>
+  
+<script>
+  let scriptURL = 'https://script.google.com/macros/s/AKfycbzejG0DCGj0_LyYSCpxMWDnkg5D7kMRbegjgiG97FYw_3IkW-qsvgWWijM_B_6pkmnFSg/exec'
+  scriptURL += "?type=new_contact";
+  const form = document.forms['submit-to-google-sheet']
+const submitBtn = document.getElementById('submit-btn');
+  form.addEventListener('submit', e => {
+    e.preventDefault()
+    submitBtn.disabled = true;
+    // fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+    //   .then(response => console.log('Success!', response))
+    //   .catch(error => console.error('Error!', error.message))
+    let data = {
+        name: form.name.value,
+        phone: form.phone.value,
+        businessName: form.businessName.value,
+        area: form.area.value,
+        comment: form.comment.value,
+        referrer: form.referrer.value,
+    }
+    fetch(scriptURL, {
+      redirect: "follow",
+      method: "POST",
+      body: JSON.stringify(data),
+      
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+    })
+      .then((response) => {
+        if(response.ok) {
+          alert("הטופס נשלח בהצלחה");
+          form.reset();
+        } else {
+        console.error("Error:", response);
+          alert("הטופס לא נשלח");
+        }
+      }).catch((error) => {
+        console.error("Error:", error);
+        alert("הטופס לא נשלח");
+      }).finally(() => {
+        submitBtn.disabled = false;
+      });
+  })
+</script>
+</body>
+</html>
